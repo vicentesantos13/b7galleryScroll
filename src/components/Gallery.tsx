@@ -2,9 +2,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Photo } from "@/types/Photo";
 const Gallery = () => {
-  const [photos, setphotos] = useState<Photo[]>([]);
+  const [photos, setPhotos] = useState<Photo[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
+
+  const lastLoadedPage = useRef(1);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -19,8 +21,8 @@ const Gallery = () => {
         ...photo,
         download_url: `https://picsum.photos/id/${photo.id}/500/333`,
       }));
-      setphotos(updatedPhotos);
 
+      setPhotos((photos) => [...photos, ...updatedPhotos]);
       setPage((prevPage) => prevPage + 1);
     } catch (error) {
       console.log("Erro ao carregar fotos:", error);
@@ -31,18 +33,20 @@ const Gallery = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
   const handleScroll = () => {
     if (
-      window.innerHeight + document.documentElement.scrollTop + 200 >=
-        document.documentElement.offsetHeight ||
-      isLoading
+      window.innerHeight + document.documentElement.scrollTop + 300 >=
+      document.documentElement.scrollHeight
     ) {
-      return;
-    } else {
+      if(!isLoading && page != lastLoadedPage.current){
+
       fetchData();
+      }
+    } else {
+      return;
     }
   };
-console.log(isLoading);
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
@@ -53,7 +57,7 @@ console.log(isLoading);
       <div className=" xl:max-w-7xl mx-auto p-6 xl:p-0 xl:mt-6 gap-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
         {photos.map((item, index) => (
           <div
-            key={item.id}
+            key={index}
             style={{ backgroundImage: `url(${item.download_url})` }}
             className="max-w-[344px] sm:max-w-none w-full aspect-[7/5] bg-white rounded-lg place-self-center bg-center bg-no-repeat bg-cover"
           ></div>
