@@ -1,57 +1,26 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { Photo } from "@/types/Photo";
+import GalleryHandler from "@/handler/GalleryHandler";
 const Gallery = () => {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [page, setPage] = useState<number>(1);
 
-  const lastLoadedPage = useRef(1);
+  const { getGallery, handleScroll } = GalleryHandler({
+    setIsLoading,
+    setPhotos,
+    isLoading,
+  });
 
-  const fetchData = async () => {
-    setIsLoading(true);
-
-    try {
-      const response = await fetch(
-        `https://picsum.photos/v2/list?page=${page}&limit=6`
-      );
-      const data = await response.json();
-
-      const updatedPhotos = data.map((photo: Photo, index: number) => ({
-        ...photo,
-        download_url: `https://picsum.photos/id/${photo.id}/500/333`,
-      }));
-
-      setPhotos((photos) => [...photos, ...updatedPhotos]);
-      setPage((prevPage) => prevPage + 1);
-    } catch (error) {
-      console.log("Erro ao carregar fotos:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
   useEffect(() => {
-    fetchData();
+    getGallery();
   }, []);
-
-  const handleScroll = () => {
-    if (
-      window.innerHeight + document.documentElement.scrollTop + 300 >=
-      document.documentElement.scrollHeight
-    ) {
-      if(!isLoading && page != lastLoadedPage.current){
-
-      fetchData();
-      }
-    } else {
-      return;
-    }
-  };
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isLoading]);
+
   return (
     <div className=" w-full bg-blackB7Gallery pb-6 ">
       <div className=" xl:max-w-7xl mx-auto p-6 xl:p-0 xl:mt-6 gap-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
