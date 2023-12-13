@@ -13,6 +13,7 @@ const Gallery = () => {
   });
 
   useEffect(() => {
+    
     getGallery();
   }, []);
 
