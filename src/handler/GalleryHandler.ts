@@ -7,7 +7,8 @@ const GalleryHandler = ({ setIsLoading, setPhotos, isLoading }: IGalleryHandler)
 
   const [page, setPage] = useState<number>(1);
 
-  const lastLoadedPage = useRef(1)
+  const SCROLL_OFFSET = 300 ;
+  
 
   const getGallery = async () => {
     setIsLoading(true);
@@ -29,10 +30,10 @@ const GalleryHandler = ({ setIsLoading, setPhotos, isLoading }: IGalleryHandler)
 
   const handleScroll = () => {
     if (
-      window.innerHeight + document.documentElement.scrollTop + 300 >=
+      window.innerHeight + document.documentElement.scrollTop + SCROLL_OFFSET >=
       document.documentElement.scrollHeight
     ) {
-      if (!isLoading && page != lastLoadedPage.current) {
+      if (!isLoading && page != 1) {
         getGallery();
       }
     } else {
